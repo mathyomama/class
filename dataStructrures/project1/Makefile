@@ -18,7 +18,7 @@ $(ODIR)/%.o: $(SDIR)/%.cpp $(DEP) build
 	$(CC) $(CPPFLAGS) -c -o $@ $<
 
 build:
-	@mkdir -p $(OBJ)
+	@mkdir -p $(ODIR)
 
 .PHONY: clean
 

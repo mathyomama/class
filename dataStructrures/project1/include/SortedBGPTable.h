@@ -1,6 +1,7 @@
 #ifndef SortedBGPTable_H
 #define SortedBGPTable_H
 
+#include <map>
 #include <unordered_map>
 #include <string>
 #include <vector>
@@ -12,16 +13,18 @@
 class SortedBGPTable {
 	public:
 		//type definition to make the code more concise
-		typedef std::unordered_map<std::string, std::vector<std::string>> BGPTable;
+		typedef std::map<int, int> neighbors;
+		typedef std::unordered_map<int, neighbors> BGPTable;
 
 		//Constructor
-		explicit SortedBGPTable(std::string& key, std::vector<std::string>& value);
+		explicit SortedBGPTable();
 
-		SortedBGPTable::BGPTable insert_neighbor(std::string neighbor_str, char delim);
-		SortedBGPTable::BGPTable insert_neighbor(std::vector<std::string> neighbor_arr);
+		neighbors & operator[](int key);
+		const SortedBGPTable::BGPTable & insert_neighbor(std::vector<int> & neighbor_arr);
+		static std::vector<int> parse_BGP_input(const std::string & neighbor_str);
 
 	private:
-		SortedBGPTable::BGPTable table;
+		BGPTable table;
 };
 
 

@@ -1,17 +1,10 @@
 #include <iostream>
+#include <sstream>
 #include <vector>
 #include <unordered_map>
 #include <string>
-#include <regex>
+#include "SortedBGPTable.h"
 
-
-class SortedBGPTable {
-	public:
-		explicit SortedBGPTable();
-
-	private:
-		std::unordered_map<std::vector<std::string>> table;
-}
 
 /*
  * This will split the given string a certain number of times if given a count greater than zero or until the
@@ -33,34 +26,19 @@ std::vector<std::string> split_line(const std::string &str, char delim) {
 	return arr;
 }
 
-std::vector<string> &split_neighbors(const std::string &str, char delim, std::vector<std::string> &arr) {
-	std::stringstream iss (str);
-	std::string elem, last;
-	last = "0";
-	while (getline(iss, elem, delim)) {
-		getline(iss, elem, delim);
-		if () {
-			arr.push_back(elem);
-		}
-	}
-}
-
 int main() {
 	std::string line;
+	std::vector<int> arr;
+	SortedBGPTable proj_table;
 	while (std::getline(std::cin, line)) {
-		std::vector<std::string> arr = split_line(line, '|');
-		arr = split(arr.back(), ' ');
-		std::cout << arr.back() << std::endl;
+		arr = SortedBGPTable::parse_BGP_input(line);
+		proj_table.insert_neighbor(arr);
 	}
-	/*unordered_map<int, vector<int>> routing_set;
+
+	SortedBGPTable::neighbors small_array = proj_table[701];
+	for (auto x : small_array) {
+		std::cout << x.first << " " <<  x.second << std::endl;
+	}
 	
-	vector<int> neighbors {496, 2001, 9001};
-	pair<int, vector<int>> key_value {23, neighbors};
-	routing_set.insert(key_value);
-
-	for (auto& x: routing_set) {
-		cout << x.first << ": " << x.second << endl;
-	}*/
-
 	return 0;
 }
