@@ -1,4 +1,4 @@
-CC=g++47
+CC=g++
 DDIR=include
 SDIR=src
 ODIR=obj

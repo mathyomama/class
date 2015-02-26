@@ -40,7 +40,7 @@ namespace cop4530 {
 			void push(T&& val); // the move version of the above function
 			int size();
 
-		private:
+		protected:
 			// The adaptee class in the form of an object
 			Container c;
 	};
