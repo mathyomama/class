@@ -1,3 +1,8 @@
+	.text
+	.globl	main
+main:
+	
+	
 	.data
 first_input:
 	.asciiz	"Enter a base (between 2 and 36 decimal): "
