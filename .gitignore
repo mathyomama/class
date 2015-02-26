@@ -2,6 +2,7 @@ mess/
 
 # files which are compiled
 a.out
+*.x
 *.o
 
 *.txt
