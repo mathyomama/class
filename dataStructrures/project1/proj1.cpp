@@ -3,6 +3,9 @@
 #include <vector>
 #include <unordered_map>
 #include <string>
+#include <set>
+#include <utility>
+#include <list>
 #include "SortedBGPTable.h"
 
 
@@ -27,6 +30,7 @@ std::vector<std::string> split_line(const std::string &str, char delim) {
 }
 
 int main() {
+	// First part parses the input and passes it to the SortedBGPTable data structure
 	std::string line;
 	std::vector<int> arr;
 	SortedBGPTable proj_table;
@@ -35,9 +39,18 @@ int main() {
 		proj_table.insert_neighbor(arr);
 	}
 
-	SortedBGPTable::neighbors small_array = proj_table[701];
-	for (auto x : small_array) {
-		std::cout << x.first << " " <<  x.second << std::endl;
+	// This creates a list of sorted AS's
+	std::list<SortedBGPTable::ASPair> proj_sorted_list{proj_table.sorted_table()};
+
+	// This outputs the desired information to stdout or cout
+	for (auto x : proj_sorted_list) {
+		std::cout << x.first << " " << x.second.size() << " ";
+		auto i = x.second.begin();
+		std::cout << *i;
+		for (++i; i != x.second.end(); i++) {
+			std::cout << "|" << *i;
+		}
+		std::cout << std::endl;
 	}
 	
 	return 0;
