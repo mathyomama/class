@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <string>
+#include <queue>
 
 
 #define DEFAULT_THRESHOLD_VALUE 1
@@ -20,10 +21,10 @@ class BST {
 			BSTNode *left;
 			BSTNode *right;
 
-			BSTNode(const T &newElement, BSTNode *ll, BSTNode *rl) :
-				element{newElement}, left{ll}, right{rl} {}
-			BSTNode(const T &&newElement, BSTNode *ll, BSTNode *rl) :
-				element{std::move(newElement)}, left{ll}, right{rl} {}
+			BSTNode(const T &newElement, unsigned int frequency, BSTNode *ll, BSTNode *rl) :
+				element{newElement}, freq{frequency}, left{ll}, right{rl} {}
+			BSTNode(const T &&newElement, unsigned int frequency, BSTNode *ll, BSTNode *rl) :
+				element{std::move(newElement)}, freq{frequency}, left{ll}, right{rl} {}
 		};
 
 		// private functions which will be implemented recursively
@@ -52,8 +53,8 @@ class BST {
 		
 		// destructor, assignment
 		~BST(); // destructor
-		const BST operator=(const BST &rhs); // copy assignment
-		const BST operator=(BST &&rhs); // move assignment
+		const BST& operator=(const BST &rhs); // copy assignment
+		const BST& operator=(BST &&rhs); // move assignment
 
 		// public member functions
 		void buildFromInputString(const std::string input);
@@ -69,7 +70,7 @@ class BST {
 		void insert(T&& v); // insert the given value into the tree, move
 		void remove(const T& v); // remove the given value from the tree
 		bool contains(const T& v); // checks if the given value is in the tree
-}
+};
 
 // include the implementation file
 #include "bst.hpp"
