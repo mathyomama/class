@@ -140,7 +140,7 @@ void BST<T>::remove(const T &v)
 template <typename T>
 bool BST<T>::contains(const T &v)
 {
-	return contains(v, root);
+	return contains(v, root, nullptr, nullptr);
 }
 
 // PRIVATE MEMBER FUNCTIONS, most of them will be implemented using recursion
@@ -196,12 +196,26 @@ void BST<T>::makeEmpty(BSTNode* &t)
 template <typename T>
 void BST<T>::insert(const T &v, BSTNode* &t)
 {
+	if (t == nullptr) {
+		t = new BSTNode{v, 0, nullptr, nullptr};
+	} else if (v < t->left) {
+		insert(v, t->left);
+	} else if (v > t->right) {
+		insert(v, t->right);
+	}
 }
 
 // insert, recursive, move version, goes down tree and inserts at the bottom of tree
 template <typename T>
 void BST<T>::insert(T &&v, BSTNode* &t)
 {
+	if (t == nullptr) {
+		t = new BSTNode{v, 0, nullptr, nullptr};
+	} else if (v < t->left) {
+		insert(v, t->left);
+	} else if (v > t->right) {
+		insert(v, t->right);
+	}
 }
 
 // remove, recursive, remove the value from the tree
@@ -211,19 +225,38 @@ void BST<T>::remove(const T &v, BSTNode* &t)
 }
 
 // contains, recursive, checks if the value is in the tree
+// the node being examined is "t" and the parent to that node is "p"
+// "pp" is the parent of "p" which is also involved in a rotation
+// nullptr will be used to simulate "p" and "pp" of root node
 template <typename T>
-bool BST<T>::contains(const T &v, BSTNode* &t)
+bool BST<T>::contains(const T &v, BSTNode* &t, BSTNode* &p, BSTNode* &pp)
 {
 	if (t == nullptr) {
 		return false;
 	} else if (v < t->element) {
-		return contains(v, t->left);
+		return contains(v, t->left, t, p);
 	} else if (v > t->element) {
-		return contains(v, t->element);
+		return contains(v, t->element, t, p);
 	} else {
-		(t->freq)++;
+		++(t->freq);
 		if (t->freq == threshold) {
-			//single rotation
+			if (p != nullptr) {
+				if (t == p->left) { // rotate left
+					BSTNode *temp = t->right;
+					t->right = p;
+					p->left = temp;
+				} else { // rotate right
+					BSTNode *temp = t->left;
+					t-left = p;
+					p->right = temp;
+				}
+				if (pp != nullptr) { // connect "pp" to "t"
+					if (p == pp->left) {
+						pp->left = t;
+					} else {
+						pp->right = t;
+					}
+				}
 			t->freq = 0;
 		}
 		return true;
@@ -257,9 +290,21 @@ template <typename T>
 typename BST<T>::BSTNode *BST<T>::clone(BSTNode *t) const
 {
 	if (t != nullptr) {
-		return  new BSTNode{t->element, t->freq, clone(t->left), clone(t->right)};
+		return new BSTNode{t->element, t->freq, clone(t->left), clone(t->right)};
 	} else {
 		return nullptr;
+	}
+}
+
+// findMin, recursive, finds the smallest value in a given subtree
+// This could be implemented recursively or not, I chose recursively
+template <typename T>
+typename BST<T>::BSTNode *BST<T>::findMin(BSTNode *t) const
+{
+	if (t->left == nullptr) {
+		return t;
+	} else {
+		return findMin(t->left);
 	}
 }
 

@@ -34,11 +34,11 @@ class BST {
 		void insert(const T& v, BSTNode* &t);
 		void insert(T&& v, BSTNode* &t);
 		void remove(const T& v, BSTNode* &t);
-		bool contains(const T& v, BSTNode* &t);
+		bool contains(const T& v, BSTNode* &t, BSTNode* &p); // p is the parent node
 		int numOfNodes(BSTNode *t) const;
 		int height(BSTNode *t) const;
 		BSTNode *clone(BSTNode *t) const; // clone all nodes in the subtree t, used by operator= and constructor
-		void deleteTree(BSTNode *t); // delete the node and the all nodes below it, recursively
+		BSTNode *findMin(BSTNode *t) const; // find the smallest value in the subtree, used by remove
 
 		// private member variables
 		BSTNode *root;
