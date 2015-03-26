@@ -1,4 +1,6 @@
-####################
+# ***********************
+# BASE CONVERSION PROGRAM
+# ***********************
 # This program converts a number in a certain base to a
 # number in decimal. The program will prompt for a base
 # followed by a prompt for a value. The base will be an
@@ -7,9 +9,9 @@
 # for convenience. The base and value will be checked to
 # make sure they are valid. The conversion will then be
 # printed.
-####################
+# ***********************
 # The first part is the the main function
-####################
+# ***********************
 
 	.text
 	.globl	main
@@ -64,27 +66,32 @@ main:
 	addi	$v0, $0, 1
 	add	$a0, $t0, $0		# put integer into $a0
 	syscall				# print answer
+	addi	$v0, $0, 4
+	la	$a0, newline
+	syscall				# print newline
 	j	EXIT_MAIN
 BAD_BASE:
 	addi	$v0, $0, 4
 	la	$a0, not_valid_base
+	syscall
 	j	EXIT_MAIN
 BAD_VALUE:
 	addi	$v0, $0, 4
 	la	$a0, not_valid_number
+	syscall
 EXIT_MAIN:
 	lw	$s1, 8($sp)
 	lw	$s0, 4($sp)
 	lw	$ra, 0($sp)
 	addi	$sp, $sp, 12
 	jr	$ra
+	add	$0, $0, $0		# not sure what this is for
+	add	$0, $0, $0
 
 
-
-
-###################
+# ***********************
 # The next part is the data associated with the main function
-###################
+# ***********************
 
 	.data
 first_prompt:
@@ -97,7 +104,7 @@ output:
 	.asciiz "The value in decimal is: "
 
 colon:
-	.asciiz " : "
+	.asciiz ": "
 
 newline:
 	.asciiz "\n"
@@ -109,9 +116,9 @@ not_valid_number:
 	.asciiz "That is not a valid number for the given base.\n"
 
 
-###################
+# ***********************
 # The third part is the collection of functions used in main
-###################
+# ***********************
 
 	.text
 # this function converts a string value to the lowercase form.
@@ -119,19 +126,21 @@ not_valid_number:
 # terminated. the returned value is the address of the string
 to_lower:
 	add	$t0, $0, $0		# set $t0 to 0
-LOWER_LOOP:
+TO_LOWER_LOOP:
 	add	$t1, $t0, $a0		# simply add the increment since char is one byte long
-	lb	$t3, 0($t1)		# put the char into $t1
-	beq	$t3, $0, LOWER_EXIT	# check if it's the end of the string
+	lbu	$t3, 0($t1)		# put the char into $t1
+	addi	$t5, $0, 10		# 10 == '\n', what is placed at the end of the input string
+	beq	$t3, $t5, TO_LOWER_EXIT	# check if $t3 is a newline character (will also check if it's a null byte below)
+	beq	$t3, $0, TO_LOWER_EXIT	# check if it's the end of the string
 	addi	$t0, $t0, 1		# increment $t0
 	slti	$t2, $t3, 65		# 65 is the ascii value of 'A'
-	bne	$t2, $0, LOWER_LOOP	# branch back to LOWER_LOOP
+	bne	$t2, $0, TO_LOWER_LOOP	# branch back to LOWER_LOOP
 	slti	$t2, $t3, 91		# 91 is the ascii value of '[', the char before 'Z'
-	beq	$t2, $0, LOWER_LOOP
+	beq	$t2, $0, TO_LOWER_LOOP
 	addi	$t3, $t3, 32		# 32 is the distance between the 'A' and 'a'
 	sb	$t3, 0($t1)		# store the changed byte
-	j	LOWER_LOOP
-LOWER_EXIT:
+	j	TO_LOWER_LOOP
+TO_LOWER_EXIT:
 	add	$v0, $a0, $0
 	jr	$ra
 
@@ -147,19 +156,23 @@ convert_to_decimal:
 	add	$t0, $0, $0		# set $t0 to 0
 CONVERT_LOOP:
 	add	$t1, $a1, $t0		# set $t1 to the address of the first char
-	lb	$t2, 0($t1)		# load the char from the string into $t2
+	lbu	$t2, 0($t1)		# load the char from the string into $t2
+	addi	$t5, $0, 10		# 10 == '\n', what is placed at the end of the input string
+	beq	$t2, $t5, CONVERT_EXIT	# check if $t2 is a newline character (will also check if it's a null byte below)
 	beq	$t2, $0, CONVERT_EXIT	# branch if the string has reached the null byte
+	addi	$t0, $t0, 1		# increment before the loop back
 	mul	$s0, $s0, $a0		# multiply the accumulator by the base, like a shift
 	slti	$t3, $t2, 58		# check if $t2 < ':', we already checked if the characters were valid
 	beq	$t3, $0, ABC_BRANCH	# branch if $t2 > '9', character should then be 'a', 'b',...
-	subi	$t5, $t2, 48		# get the digit value of the char in $t2
+	addi	$t5, $t2, -48		# get the digit value of the char in $t2
 	add	$s0, $s0, $t5		# add the digit to the accumulator
 	j	CONVERT_LOOP		# loop back to beginning
 ABC_BRANCH:
-	subi	$t5, $t2, 87		# get the digit value of the char, 87 == 'W' but 10 below 97 == 'a'
+	addi	$t5, $t2, -87		# get the digit value of the char, 87 == 'W' but 10 below 97 == 'a'
 	add	$s0, $s0, $t5		# add the digit to the accumulator
 	j	CONVERT_LOOP		# loop back to beginning
 CONVERT_EXIT:
+	add	$v0, $s0, $0		# put result into $v0
 	lw	$s0, 0($sp)		# put value back into $s0 register
 	addi	$sp, $sp, 4		# restore the stack
 	jr	$ra			# jump back to caller
@@ -170,7 +183,7 @@ CONVERT_EXIT:
 check_base:
 	slti	$t0, $a0, 2
 	bne	$t0, $0, BASE_FALSE
-	slti	$t0, $a0, 33
+	slti	$t0, $a0, 37
 	beq	$t0, $0, BASE_FALSE
 	add	$v0, $t0, $0		# $t0 should be set to 1 from slti at this point
 	j	BASE_EXIT
@@ -190,29 +203,32 @@ check_value:
 	addi	$t4, $a0, 48		# 48 == '0' and $t4 holds the least char not in character set
 LOWER_LOOP:
 	add	$t1, $t0, $a1		# put the address of the current char into t1
-	lb	$t2, 0($t1)		# load the char into $t2
-	beq	$t2, $0, VALUE_TRUE	# string is a good because all the characters have been looked at
+	lbu	$t2, 0($t1)		# load the char into $t2
+	addi	$t5, $0, 10		# 10 == '\n', the character placed at the end of the input string
+	beq	$t2, $t5, VALUE_TRUE	# check if $t2 is a newline character (will also check if it's a null byte below)
+	beq	$t2, $0, VALUE_TRUE	# char == null byte, string is a good, all characters have been looked at, not sure if this is possible to reach
 	slti	$t5, $t2, 48		# check if char $t2 is less than '0'
 	bne	$t5, $0, VALUE_FALSE	# if char < '0' branch to false
 	slt	$t5, $t2, $t4		# check if char $t2 is less than $t4
 	beq	$t5, $0, VALUE_FALSE	# if char >= number branch to false
-	addi	$t1, $t1, 1		# increment index by 1
+	addi	$t0, $t0, 1		# increment index by 1
 	j	LOWER_LOOP		# loop back
 UPPER_BRANCH:
-	addi	$t4, $a0, -10		# first subtract 10 from base which will be the offset
-	addi	$t4, $t4, 97		# 97 == 'a' and $t4 holds the least char not in character set
+	addi	$t4, $a0, 87		# 97 == 'a', 87 accounts for first ten digits and $t4 holds the least char not in character set
 UPPER_LOOP:
 	add	$t1, $t0, $a1		# put the address of the current char into t1
-	lb	$t2, 0($t1)		# load the char into $t2
-	beq	$t2, $0, VALUE_TRUE	# string is a good because all the characters have been looked at
-	slti	$t5, $t2, 48		# check if char $t2 is less than '0'
-	bne	$t5, $0, VALUE_FALSE	# if char < '0' branch to false
-	addi	$t1, $t1, 1		# increment index by 1, do it here before the jump back to UPPER_LOOP
+	lbu	$t2, 0($t1)		# load the char into $t2
+	addi	$t5, $0, 10		# same routine as LOWER_LOOP
+	beq	$t2, $t5, VALUE_TRUE
+	beq	$t2, $0, VALUE_TRUE
+	slti	$t5, $t2, 48
+	bne	$t5, $0, VALUE_FALSE
+	addi	$t0, $t0, 1		# increment index by 1, do it here before the jump back to UPPER_LOOP
 	slti	$t5, $t2, 58		# check if char $t2 is less than ':', one above '9'
 	bne	$t5, $0, UPPER_LOOP	# if char >= number branch to false
 	slti	$t5, $t2, 97		# check if char $t2 is less than 'a'
 	bne	$t5, $0, VALUE_FALSE	# branch if ':' >= $t2 > 'a' to VALUE_FALSE
-	slti	$t5, $t2, $t4		# check if char $t2 is less than $t4
+	slt	$t5, $t2, $t4		# check if char $t2 is less than $t4
 	beq	$t5, $0, VALUE_FALSE	# branch if $t2 >= $t4
 	j	UPPER_LOOP		# loop back
 VALUE_FALSE:

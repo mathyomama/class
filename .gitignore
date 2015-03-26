@@ -8,3 +8,10 @@ a.out
 *.txt
 *.swp
 *.tar
+*.tar.gz
+*.tar.bz
+*.zip
+*.bak
+
+# picture formats
+*.pgm

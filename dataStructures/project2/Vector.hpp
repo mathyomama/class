@@ -286,11 +286,11 @@ template <typename T>
 typename Vector<T>::iterator Vector<T>::erase(Vector<T>::iterator itr)
 {
 	T oldVal = *itr;
-	for (auto index = itr; index != end(); ++index) {
+	for (auto index = itr; index != end() - 1; ++index) {
 		*index = std::move(*(index + 1));
 	}
 	--theSize;
-	return itr;
+	return oldVal;
 	/*
 	 * This part confused me, I am not sure if the method is suppose to return the iterator behind the 
 	 * erased one before the shift in values or after the shift in values. This implementation returns
