@@ -63,8 +63,31 @@ const BST<T>& BST<T>::operator=(BST &&rhs)
 
 // buildFromInputString: take a string and organize values in BST
 template <typename T>
-void buildFromInputString(const std::string input)
+void BST<T>::buildFromInputString(const std::string input)
 {
+	if (!empty()) {
+		makeEmpty();
+	}
+	std::istringstream iss(input);
+	do {
+		std::string substring;
+		iss >> substring;
+		insert(substring);
+	} while (iss);
+}
+
+template <>
+void BST<int>::buildFromInputString(const std::string input)
+{
+	if (!empty()) {
+		makeEmpty();
+	}
+	std::istringstream iss(input);
+	do {
+		std::string substring;
+		iss >> substring;
+		insert(std::stoi(substring));
+	} while(iss);
 }
 
 // empty: check if the BST is empty
@@ -198,9 +221,9 @@ void BST<T>::insert(const T &v, BSTNode* &t)
 {
 	if (t == nullptr) {
 		t = new BSTNode{v, 0, nullptr, nullptr};
-	} else if (v < t->left) {
+	} else if (v < t->element) {
 		insert(v, t->left);
-	} else if (v > t->right) {
+	} else if (v > t->element) {
 		insert(v, t->right);
 	}
 }
@@ -211,9 +234,9 @@ void BST<T>::insert(T &&v, BSTNode* &t)
 {
 	if (t == nullptr) {
 		t = new BSTNode{v, 0, nullptr, nullptr};
-	} else if (v < t->left) {
+	} else if (v < t->element) {
 		insert(v, t->left);
-	} else if (v > t->right) {
+	} else if (v > t->element) {
 		insert(v, t->right);
 	}
 }
