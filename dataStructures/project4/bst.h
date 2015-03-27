@@ -33,8 +33,8 @@ class BST {
 		void makeEmpty(BSTNode* &t);
 		void insert(const T& v, BSTNode* &t);
 		void insert(T&& v, BSTNode* &t);
-		void remove(const T& v, BSTNode* &t);
-		bool contains(const T& v, BSTNode* &t, BSTNode* &p); // p is the parent node
+		void remove(const T& v, BSTNode* &t, BSTNode* &p);
+		bool contains(const T& v, BSTNode* &t, BSTNode* &p, BSTNode* &pp); // p is the parent node, pp is the parent of p
 		int numOfNodes(BSTNode *t) const;
 		int height(BSTNode *t) const;
 		BSTNode *clone(BSTNode *t) const; // clone all nodes in the subtree t, used by operator= and constructor

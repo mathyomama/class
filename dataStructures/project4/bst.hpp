@@ -61,13 +61,13 @@ const BST<T>& BST<T>::operator=(BST &&rhs)
 	return *this;
 }
 
-// buildFromInputString, take a string and organize values in BST
+// buildFromInputString: take a string and organize values in BST
 template <typename T>
 void buildFromInputString(const std::string input)
 {
 }
 
-// empty, check if the BST is empty
+// empty: check if the BST is empty
 template <typename T>
 bool BST<T>::empty()
 {
@@ -78,7 +78,7 @@ bool BST<T>::empty()
 	}
 }
 
-// printInOrder, left | root | right
+// printInOrder: left | root | right
 template <typename T>
 void BST<T>::printInOrder() const
 {
@@ -86,7 +86,7 @@ void BST<T>::printInOrder() const
 	std::cout << std::endl;
 }
 
-// printLevelOrder, print all elements at a depth before moving to next depth
+// printLevelOrder: print all elements at a depth before moving to next depth
 template <typename T>
 void BST<T>::printLevelOrder() const
 {
@@ -94,49 +94,49 @@ void BST<T>::printLevelOrder() const
 	std::cout << std::endl;
 }
 
-// NumOfNodes, returns the number of nodes in the tree
+// NumOfNodes: returns the number of nodes in the tree
 template <typename T>
 int BST<T>::numOfNodes() const
 {
 	return numOfNodes(root);
 }
 
-// height, returns the height of the tree
+// height: returns the height of the tree
 template <typename T>
 int BST<T>::height() const
 {
 	return height(root);
 }
 
-// makeEmpty, clears the BST of all the values
+// makeEmpty: clears the BST of all the values
 template <typename T>
 void BST<T>::makeEmpty()
 {
 	makeEmpty(root);
 }
 
-// insert, with copy semantics
+// insert: with copy semantics
 template <typename T>
 void BST<T>::insert(const T &v)
 {
 	insert(v, root);
 }
 
-// insert, with move semantics
+// insert: with move semantics
 template <typename T>
 void BST<T>::insert(T &&v)
 {
 	insert(v, root);
 }
 
-// remove, delete the node with the given value
+// remove: delete the node with the given value
 template <typename T>
 void BST<T>::remove(const T &v)
 {
-	remove(v, root);
+	remove(v, root, nullptr);
 }
 
-// contains, checks if the given value is in the tree
+// contains: checks if the given value is in the tree
 template <typename T>
 bool BST<T>::contains(const T &v)
 {
@@ -145,7 +145,7 @@ bool BST<T>::contains(const T &v)
 
 // PRIVATE MEMBER FUNCTIONS, most of them will be implemented using recursion
 
-// printInOrder, recursive, prints in the order left | root | right (infix)
+// printInOrder: recursive, prints in the order left | root | right (infix)
 // prints only what is under the node given
 template <typename T>
 void BST<T>::printInOrder(BSTNode *t) const
@@ -159,7 +159,7 @@ void BST<T>::printInOrder(BSTNode *t) const
 	}
 }
 
-// printLevelOrder, prints each level first before moving to the next level
+// printLevelOrder: prints each level first before moving to the next level
 // breadth first search => queue, prints only what is under the node given
 template <typename T>
 void BST<T>:: printLevelOrder(BSTNode *t) const
@@ -181,7 +181,7 @@ void BST<T>:: printLevelOrder(BSTNode *t) const
 	}
 }
 
-// makeEmpty, recursive, goes down the tree deleting each node
+// makeEmpty: recursive, goes down the tree deleting each node
 template <typename T>
 void BST<T>::makeEmpty(BSTNode* &t)
 {
@@ -192,7 +192,7 @@ void BST<T>::makeEmpty(BSTNode* &t)
 	}
 }
 
-// insert, recursive, copy version, goes down tree and inserts at the bottom of tree
+// insert: recursive, copy version, goes down tree and inserts at the bottom of tree
 template <typename T>
 void BST<T>::insert(const T &v, BSTNode* &t)
 {
@@ -205,7 +205,7 @@ void BST<T>::insert(const T &v, BSTNode* &t)
 	}
 }
 
-// insert, recursive, move version, goes down tree and inserts at the bottom of tree
+// insert: recursive, move version, goes down tree and inserts at the bottom of tree
 template <typename T>
 void BST<T>::insert(T &&v, BSTNode* &t)
 {
@@ -218,13 +218,57 @@ void BST<T>::insert(T &&v, BSTNode* &t)
 	}
 }
 
-// remove, recursive, remove the value from the tree
+// remove: recursive, remove the value from the tree
 template <typename T>
-void BST<T>::remove(const T &v, BSTNode* &t)
+void BST<T>::remove(const T &v, BSTNode* &t, BSTNode* &p)
 {
+	if (t == nullptr) { // check if the node is a nullptr
+		std::cout << "That value, " << v << ", is not in the BST." << std::endl;
+	} else if (v < t->element) { 
+		remove(v, t->left, t);
+	} else if (v > t->element) {
+		remove(v, t->right, t);
+	} else if (v == t->element) { // found a match
+		bool isLeft = p->left == t ? true : false;
+		if (t->left == nullptr) {
+			if (t->right == nullptr) { // t is a leaf
+				if (isLeft) {
+					p->left = nullptr;
+				} else {
+					p->right = nullptr;
+				}
+				delete t;
+			} else { // t has a right child
+				if (isLeft) {
+					p->left = t->right;
+				} else {
+					p->right = t->right;
+				}
+			}
+		} else if (t->right == nullptr) { // t has a left child
+			if (isLeft) {
+				p->left = t->left;
+			} else {
+				p->right = t->left;
+			}
+		} else { // t has two children
+			BSTNode *minRight = t->right, minP = t;
+			while (minRight->left != nullptr) { // find the smallest value on the right child, nonrecursive since it seems easier to grab the necessary nodes
+				minP = minRight;
+				minRight = minRight->left;
+			}
+			if (isLeft) {
+				p->left = minRight;
+			} else {
+				p->right = minRight;
+			}
+			minP = nullptr;
+		}
+		delete t;
+	}
 }
 
-// contains, recursive, checks if the value is in the tree
+// contains: recursive, checks if the value is in the tree
 // the node being examined is "t" and the parent to that node is "p"
 // "pp" is the parent of "p" which is also involved in a rotation
 // nullptr will be used to simulate "p" and "pp" of root node
@@ -247,7 +291,7 @@ bool BST<T>::contains(const T &v, BSTNode* &t, BSTNode* &p, BSTNode* &pp)
 					p->left = temp;
 				} else { // rotate right
 					BSTNode *temp = t->left;
-					t-left = p;
+					t->left = p;
 					p->right = temp;
 				}
 				if (pp != nullptr) { // connect "pp" to "t"
@@ -257,13 +301,14 @@ bool BST<T>::contains(const T &v, BSTNode* &t, BSTNode* &p, BSTNode* &pp)
 						pp->right = t;
 					}
 				}
+			}
 			t->freq = 0;
 		}
 		return true;
 	}
 }
 
-// numOfNodes, recursive, returns the number of nodes in given tree
+// numOfNodes: recursive, returns the number of nodes in given tree
 template <typename T>
 int BST<T>::numOfNodes(BSTNode *t) const
 {
@@ -275,7 +320,7 @@ int BST<T>::numOfNodes(BSTNode *t) const
 	return numOfNodes(t->left) + numOfNodes(t->right) + 1; // +1 for the node itself
 }
 
-// height, recursive, returns the height of the given tree
+// height: recursive, returns the height of the given tree
 template <typename T>
 int BST<T>::height(BSTNode *t) const
 {
@@ -285,7 +330,7 @@ int BST<T>::height(BSTNode *t) const
 	return std::max(height(t->left), height(t->right)) + 1; // +1 for the link itself
 }
 
-// clone, recursive, makes a copy of the tree under the node and returns the copy
+// clone: recursive, makes a copy of the tree under the node and returns the copy
 template <typename T>
 typename BST<T>::BSTNode *BST<T>::clone(BSTNode *t) const
 {
@@ -296,16 +341,5 @@ typename BST<T>::BSTNode *BST<T>::clone(BSTNode *t) const
 	}
 }
 
-// findMin, recursive, finds the smallest value in a given subtree
-// This could be implemented recursively or not, I chose recursively
-template <typename T>
-typename BST<T>::BSTNode *BST<T>::findMin(BSTNode *t) const
-{
-	if (t->left == nullptr) {
-		return t;
-	} else {
-		return findMin(t->left);
-	}
-}
 
 #endif
