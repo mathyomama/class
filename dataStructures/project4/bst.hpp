@@ -5,7 +5,7 @@
 
 // constructor, default value for threshold is 1
 template <typename T>
-BST<T>::BST(int th) :
+BST<T>::BST(unsigned int th) :
 	threshold{th}, root{nullptr}
 {
 }
@@ -13,7 +13,7 @@ BST<T>::BST(int th) :
 // constructor, takes an input string, default value for threshold is 1
 // input string is a space separated string, conversion can be made to int
 template <typename T>
-BST<T>::BST(std::string input, int th) :
+BST<T>::BST(std::string input, unsigned int th) :
 	threshold{th}, root{nullptr}
 {
 	buildFromInputString(input);
@@ -47,7 +47,7 @@ BST<T>::~BST()
 template <typename T>
 const BST<T>& BST<T>::operator=(const BST &rhs)
 {
-	BST<T> copy = rhs;
+	BST<T> copy = rhs; // This should call the copy constructor which should call clone on all the nodes
 	std::swap(*this, copy);
 	return *this;
 }
@@ -69,13 +69,16 @@ void BST<T>::buildFromInputString(const std::string input)
 		makeEmpty();
 	}
 	std::istringstream iss(input);
-	do {
-		std::string substring;
-		iss >> substring;
+	std::string substring;
+	while(iss >> substring) {
 		insert(substring);
-	} while (iss);
+	}
 }
 
+// buildFromInputString: the int implementation. Part of the problem descriptiion
+// asked for an "int" version which can be essentially initialized with an input
+// string. This is very similar to the above function but converts strings to int
+// which affects the order of elements.
 template <>
 void BST<int>::buildFromInputString(const std::string input)
 {
@@ -83,11 +86,10 @@ void BST<int>::buildFromInputString(const std::string input)
 		makeEmpty();
 	}
 	std::istringstream iss(input);
-	do {
-		std::string substring;
-		iss >> substring;
+	std::string substring;
+	while (iss >> substring) {
 		insert(std::stoi(substring));
-	} while(iss);
+	}
 }
 
 // empty: check if the BST is empty
@@ -156,14 +158,14 @@ void BST<T>::insert(T &&v)
 template <typename T>
 void BST<T>::remove(const T &v)
 {
-	remove(v, root, nullptr);
+	remove(v, root);
 }
 
 // contains: checks if the given value is in the tree
 template <typename T>
 bool BST<T>::contains(const T &v)
 {
-	return contains(v, root, nullptr, nullptr);
+	return contains(v, root, root);
 }
 
 // PRIVATE MEMBER FUNCTIONS, most of them will be implemented using recursion
@@ -213,6 +215,7 @@ void BST<T>::makeEmpty(BSTNode* &t)
 		makeEmpty(t->right);
 		delete t;
 	}
+	t = nullptr;
 }
 
 // insert: recursive, copy version, goes down tree and inserts at the bottom of tree
@@ -221,10 +224,14 @@ void BST<T>::insert(const T &v, BSTNode* &t)
 {
 	if (t == nullptr) {
 		t = new BSTNode{v, 0, nullptr, nullptr};
+		std::cout << "inserted " << v << std::endl;
 	} else if (v < t->element) {
 		insert(v, t->left);
 	} else if (v > t->element) {
 		insert(v, t->right);
+	} else {
+		std::cout << v << " is already in the tree." << std::endl;
+		return;
 	}
 }
 
@@ -234,103 +241,78 @@ void BST<T>::insert(T &&v, BSTNode* &t)
 {
 	if (t == nullptr) {
 		t = new BSTNode{v, 0, nullptr, nullptr};
+		std::cout << "inserted " << v << std::endl;
 	} else if (v < t->element) {
 		insert(v, t->left);
 	} else if (v > t->element) {
 		insert(v, t->right);
+	} else {
+		std::cout << v << " is already in the tree." << std::endl;
+		return;
 	}
 }
 
 // remove: recursive, remove the value from the tree
+// If the node being removed has two children, then replace the node with the
+// smallest element in the right node. This will always be a fitting replacement.
 template <typename T>
-void BST<T>::remove(const T &v, BSTNode* &t, BSTNode* &p)
+void BST<T>::remove(const T& v, BSTNode* &t)
 {
-	if (t == nullptr) { // check if the node is a nullptr
-		std::cout << "That value, " << v << ", is not in the BST." << std::endl;
-	} else if (v < t->element) { 
-		remove(v, t->left, t);
+	if (t == nullptr) {
+		std::cout << v << " is not in the tree." << std::endl;
+		return;
+	}
+	if (v < t->element) {
+		remove(v, t->left);
 	} else if (v > t->element) {
-		remove(v, t->right, t);
-	} else if (v == t->element) { // found a match
-		bool isLeft = p->left == t ? true : false;
-		if (t->left == nullptr) {
-			if (t->right == nullptr) { // t is a leaf
-				if (isLeft) {
-					p->left = nullptr;
-				} else {
-					p->right = nullptr;
-				}
-				delete t;
-			} else { // t has a right child
-				if (isLeft) {
-					p->left = t->right;
-				} else {
-					p->right = t->right;
-				}
-			}
-		} else if (t->right == nullptr) { // t has a left child
-			if (isLeft) {
-				p->left = t->left;
-			} else {
-				p->right = t->left;
-			}
-		} else { // t has two children
-			BSTNode *minRight = t->right, minP = t;
-			while (minRight->left != nullptr) { // find the smallest value on the right child, nonrecursive since it seems easier to grab the necessary nodes
-				minP = minRight;
-				minRight = minRight->left;
-			}
-			if (isLeft) {
-				p->left = minRight;
-			} else {
-				p->right = minRight;
-			}
-			minP = nullptr;
+		remove(v, t->right);
+	} else if (t->left != nullptr && t->right != nullptr) {
+		BSTNode* min = t->right; // find the smallest node on the right subtree
+		while (min->left != nullptr) {
+			min = min->left;
 		}
-		delete t;
+		t->element = min->element;
+		remove(t->element, t->right);
+	} else {
+		BSTNode* oldNode = t;
+		t = (t->left != nullptr) ? t->left : t->right;
+		delete oldNode;
 	}
 }
 
 // contains: recursive, checks if the value is in the tree
 // the node being examined is "t" and the parent to that node is "p"
-// "pp" is the parent of "p" which is also involved in a rotation
-// nullptr will be used to simulate "p" and "pp" of root node
+// root will be used to simulate "p"
 template <typename T>
-bool BST<T>::contains(const T &v, BSTNode* &t, BSTNode* &p, BSTNode* &pp)
+bool BST<T>::contains(const T &v, BSTNode* &t, BSTNode* &p)
 {
 	if (t == nullptr) {
 		return false;
 	} else if (v < t->element) {
-		return contains(v, t->left, t, p);
+		return contains(v, t->left, t);
 	} else if (v > t->element) {
-		return contains(v, t->element, t, p);
+		return contains(v, t->right, t);
 	} else {
 		++(t->freq);
 		if (t->freq == threshold) {
-			if (p != nullptr) {
-				if (t == p->left) { // rotate left
-					BSTNode *temp = t->right;
-					t->right = p;
-					p->left = temp;
-				} else { // rotate right
-					BSTNode *temp = t->left;
-					t->left = p;
-					p->right = temp;
+			if (t != root) {
+				BSTNode *temp;
+				if (t == p->left) { // t is on the left, rotate left
+					temp = p->left;
+					p->left = temp->right;
+					temp->right = p;
+				} else { // t is on the right, rotate right
+					temp = p->right;
+					p->right = temp->left;
+					temp->left = p;
 				}
-				if (pp != nullptr) { // connect "pp" to "t"
-					if (p == pp->left) {
-						pp->left = t;
-					} else {
-						pp->right = t;
-					}
-				}
+				p = temp; // assign to the new parent node, make temp the new root of the subtree
 			}
-			t->freq = 0;
+			p->freq = 0; // restore the frequency to zero for the moved node
 		}
 		return true;
 	}
 }
-
 // numOfNodes: recursive, returns the number of nodes in given tree
 template <typename T>
 int BST<T>::numOfNodes(BSTNode *t) const

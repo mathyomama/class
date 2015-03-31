@@ -1,7 +1,7 @@
 CC=g++
 CPPFLAGS=-Wall -g -std=c++11
 
-PROGRAM=test
+PROGRAM=proj4_driver
 DEP=$(wildcard *.h)
 DEP+=$(wildcard *.hpp)
 all: $(PROGRAM)
