@@ -27,7 +27,7 @@ public class cyk {
     //check whether (A,B,C) exists in production
     // This function checks whether A --> BC / or A --> a exists in the production rules
     // To check A-->BC is in production rules call existProd(1, 2, 3)
-    // To check A --> a is in production rules call existProd(1, 0)
+    // To check A --> a is in production rules call existProd(1, 0, -1)
     boolean existProd(int a, int b, int c) {
         int i;
         for (i = 0; i < production.length; ++i) {
@@ -46,6 +46,33 @@ public class cyk {
 		V=new boolean [N][N][VarNum];
 
         //Fill in your program here
+		for (int step = 0; step < N; ++step) {
+			for (int j = step; j < N; ++j) { // j is the second index of the V array
+				int i = j - step; // i is the first index of the V array
+				for (int var = 0; var < VarNum; ++var) {
+					if (step == 0) {
+						V[i][j][var] = existProd(var, w[j], -1); // for when the substring is of length 1 (initial case)
+					} else {
+						boolean exist = false; // true when production var -> v1 v2 exists
+						int k = i; // i <= k < j
+						while (!exist && k < j) {
+							int v1 = 0;
+							while (!exist && v1 < VarNum) {
+								int v2 = 0;
+								while (!exist && v2 < VarNum) {
+									if (V[i][k][v1] == true && V[k + 1][j][v2] == true) { // only check if v1 is in V_ik and v2 is in V_k+1j
+										exist = V[i][j][var] = existProd(var, v1, v2); // set exist to true to stop search
+									}
+									++v2;
+								}
+								++v1;
+							}
+							++k;
+						}
+					}
+				}
+			}
+		}
     }
 
     public void Print_matrix(String str) {

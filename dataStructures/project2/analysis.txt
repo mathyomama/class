@@ -1,0 +1,5 @@
+The worst case time complexity of erase(iterator itr) is Big-O(n).
+The worst case is when the iterator is the first element.
+This means that every element after the first must be shifted to the position before it.
+So the for loop in the erase procedure will have to execute "n - 1" times where "n" is the number of elements.
+The constant can be disregarded and the time complexity can be reduced to big-O(n).

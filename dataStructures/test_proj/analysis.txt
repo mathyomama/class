@@ -1,0 +1,24 @@
+The time complexity of the pop member function is constant, i.e. bigO(1). This is 
+because the size of the queue doesn't affect the function pop. Pop will always
+pop the front off regardless of the size. The front can be found in bigO(1) time,
+as well. The adaptee class is a deque, and the Queue pop function only uses
+deque pop_front once, so the time complexity depends on pop_front. Pop_front for
+a deque has a constant time-complexity, so pop will have a constant time complexity.
+
+
+A test program can be made to show that this is the case. In the test, the Queue
+is set up with "size" elements in the Queue (implemented by for loop of ints from
+0 to size - 1). Then a for loop is used to pop each element, so pop is called
+"size" amount of times. The time solely captures the time it takes to run the
+popping loop.
+
+Begin testing
+For size, 10000, the execution time of popping that many elements is 176ms.
+For size, 100000, the execution time of popping that many elements is 1761ms.
+For size, 125000, the execution time of popping that many elements is 1611ms.
+For size, 250000, the execution time of popping that many elements is 3109ms.
+For size, 500000, the execution time of popping that many elements is 6370ms.
+For size, 1000000, the execution time of popping that many elements is 12808ms.
+
+The ratio of size to time is about the same for each size. This shows that in the
+long run, the pop function is bigO(1) or constant.

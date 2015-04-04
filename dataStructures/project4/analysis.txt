@@ -1,0 +1,5 @@
+The time complexity of height(BSTNode *t) is bigO(n) where n is the number of
+nodes in the subtree and including t. Every node under "t" and including "t"
+must be visited once by the function call, height. (The function "height" will
+actually be called 2*n + 1 times since it has to reach nullptr for the base case,
+which is how I implemented the function. This is still bigO(n).)
