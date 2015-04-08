@@ -66,7 +66,8 @@ bool HashTable<T>::remove(const T &x)
 		return false;
 	}
 	bucketList.remove(itr);
-	return false;
+	--theSize;
+	return true;
 }
 
 // clear: remove all the elements in the hashtable
@@ -99,10 +100,13 @@ bool HashTable<T>::load(const char *filename)
 template <typename T>
 void HashTable<T>::dump()
 {
-	for (auto bucketList : table) {
+	for (unsigned long bucket = 0; bucket < table.size(); ++bucket) {
+		auto bucketList = table[bucket];
+		std::cout << "v[" << bucket << "]: ";
 		for (auto element : bucketList) {
-			std::cout << element << std::endl;
+			std::cout << element << "\t";
 		}
+		std::cout << std::endl;
 	}
 }
 
@@ -124,6 +128,13 @@ bool HashTable<T>::write_to_file(const char *filename)
 	return true;
 }
 
+// size: return the size of the hashtable, not required
+template <typename T>
+size_t HashTable<T>::size()
+{
+	return theSize;
+}
+
 
 // PRIVATE MEMBER FUNCTION
 
@@ -134,6 +145,7 @@ void HashTable<T>::makeEmpty()
 	for (auto bucketList : table) {
 		bucketList.clear();
 	}
+	theSize = 0;
 }
 
 // rehash: rehash the hashtable which will increase the size and reposition the
@@ -141,9 +153,7 @@ void HashTable<T>::makeEmpty()
 template <typename T>
 void HashTable<T>::rehash()
 {
-	unsigned long oldSize = theSize;
-	theSize = prime_below(2*theSize);
-	hash_table newTable{theSize};
+	hash_table newTable{2*table.size()};
 	for (auto bucketList : table) {
 		for (auto element : bucketList) {
 			newTable[myhash(element)].push_back(std::move(element));
@@ -155,9 +165,10 @@ void HashTable<T>::rehash()
 // myhash: the hash function for this class, it will return the index where the
 // given element should be stored
 template <typename T>
-size_t myhash(const T &x)
+size_t HashTable<T>::myhash(const T &x)
 {
-	return 0;
+	size_t buckets = table.size(); // normalize to size of table
+	return std::hash<T>(x)%buckets;
 }
 
 // returns largest prime number <= n or zero if input is too large

@@ -25,6 +25,7 @@ class HashTable {
 		bool load(const char *filename); // load the contents of the file with name filename into hashtable
 		void dump(); // display all entries in the hash table
 		bool write_to_file(const char *filename); // write all the values in the hashtable to a file named filename
+		size_t size(); // return the current size of the hashtable, not required
 
 	private:
 		// private static constant member variables used in helper functions
@@ -34,7 +35,7 @@ class HashTable {
 		// private member functions
 		void makeEmpty(); // delete all elements in the hash table
 		void rehash(); // rehash the hashtable, for when the hashtable becomes too large
-		size_t myhash(); // the hash function, returns the index of the vector entry where x should be stored
+		size_t myhash(const T &x); // the hash function, returns the index of the vector entry where x should be stored
 
 		// used when improper size is given (for example
 		// size is 0 or negatiave)
@@ -44,7 +45,7 @@ class HashTable {
 		// typedef for ease
 		typedef std::vector<std::list<T>> hash_table;
 		// private member variables
-		unsigned long theSize;
+		size_t theSize;
 		hash_table table;
 };
 
