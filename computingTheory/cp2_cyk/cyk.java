@@ -1,4 +1,5 @@
 /* 
+ * Michael Duckett
  * CYK algorithm for Context Free Language
  * Author: Chenguang Zhu
  * Stanford University
