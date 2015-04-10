@@ -12,6 +12,9 @@ $(PROGRAM): $(OBJ)
 %.o: %.cpp $(DEP)
 	$(CC) $(CPPFLAGS) -c -o $@ $<
 
+test: 
+	$(CC) $(CPPFLAGS) -o $@.x $^ test.cpp
+
 .PHONY: clean
 
 clean:

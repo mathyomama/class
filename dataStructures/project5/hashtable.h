@@ -5,6 +5,8 @@
 #include <vector>
 #include <list>
 #include <fstream>
+#include <functional>
+#include <algorithm>
 
 
 namespace cop4530 {

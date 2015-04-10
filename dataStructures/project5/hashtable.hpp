@@ -65,7 +65,7 @@ bool HashTable<T>::remove(const T &x)
 	if (itr == std::end(bucketList)) {
 		return false;
 	}
-	bucketList.remove(itr);
+	bucketList.erase(itr);
 	--theSize;
 	return true;
 }
@@ -168,7 +168,7 @@ template <typename T>
 size_t HashTable<T>::myhash(const T &x)
 {
 	size_t buckets = table.size(); // normalize to size of table
-	return std::hash<T>(x)%buckets;
+	return std::hash<T>{}(x)%buckets;
 }
 
 // returns largest prime number <= n or zero if input is too large
