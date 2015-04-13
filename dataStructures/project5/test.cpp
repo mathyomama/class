@@ -156,8 +156,8 @@ bool test_big_load() {
 	// test size and time of program
 	test_intro("big hashtable time");
 	bool check_big = true;
-	HashTable<int> big_hash{1000000};
-	for (int limit = 10; limit < 1000; limit *= 10) {
+	HashTable<int> big_hash{1000100};
+	for (int limit = 10; limit < 1000000; limit *= 10) {
 		std::cout << "\ttesting " << limit << " values:" << std::endl;
 		// insertion
 		clock_t start = clock();
@@ -184,7 +184,7 @@ bool test_big_load() {
 		// removal
 		start = clock();
 		for (int j = 0; j < limit; ++j) {
-			if (!big_hash.contains(j)) {
+			if (!big_hash.remove(j)) {
 				print_fail("Big Test: could not remove %d in large hashtable." , j);
 				check_big = false;
 				break;

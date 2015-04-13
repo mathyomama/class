@@ -24,7 +24,28 @@ void menu()
 	cout << "\nEnter choice : ";
 }
 
+void spell_check(string dictionary, string input, string output) {
+}
+
+void menu_program() {
+	string hash_size;
+	cout << "Enter preferred hash table capacity: ";
+	cin >> hash_size;
+	HashTable dict{stoi(hash_size)};
+	
+}
+
+void print_usage(string name) {
+	cout << "USAGE: " << name << " <dict_file> <file_to_check> <output_file>" << endl;
+}
+
 int main(int argc, char* argv[]) {
+	if (argc == 4) {
+		spell_check(argv[1], argv[2], argv[3]);
+	} else if (argc == 1) {
+	} else {
+		print_usage(argv[0]);
+	}
 
 	return 0;
 }

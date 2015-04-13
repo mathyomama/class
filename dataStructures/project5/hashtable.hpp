@@ -153,13 +153,16 @@ void HashTable<T>::makeEmpty()
 template <typename T>
 void HashTable<T>::rehash()
 {
-	hash_table newTable{2*table.size()};
-	for (auto bucketList : table) {
-		for (auto element : bucketList) {
-			newTable[myhash(element)].push_back(std::move(element));
+	hash_table oldTable = table;
+	table.resize(prime_below(2*table.size()));
+	for (auto &bucketList : table) {
+		bucketList.clear();
+	}
+	for (auto &bucketList : oldTable) {
+		for (auto &element : bucketList) {
+			insert(element);
 		}
 	}
-	std::swap(newTable, table);
 }
 
 // myhash: the hash function for this class, it will return the index where the
