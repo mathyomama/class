@@ -157,7 +157,7 @@ bool test_big_load() {
 	test_intro("big hashtable time");
 	bool check_big = true;
 	HashTable<int> big_hash{1000100};
-	for (int limit = 10; limit < 1000000; limit *= 10) {
+	for (int limit = 10; limit < 10000000; limit *= 10) {
 		std::cout << "\ttesting " << limit << " values:" << std::endl;
 		// insertion
 		clock_t start = clock();

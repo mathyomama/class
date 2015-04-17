@@ -43,6 +43,7 @@ int main(int argc, char* argv[]) {
 	if (argc == 4) {
 		spell_check(argv[1], argv[2], argv[3]);
 	} else if (argc == 1) {
+		menu_program();
 	} else {
 		print_usage(argv[0]);
 	}
