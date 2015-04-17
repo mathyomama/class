@@ -7,8 +7,15 @@
 // Constructor
 template <typename T>
 HashTable<T>::HashTable(size_t size) :
-	theSize{0}, table{prime_below(size)}
+	theSize{0}
 {
+	unsigned long prime = prime_below(size);
+	if (prime == 0) {
+		prime = default_capacity;
+		std::cout << "set to default capacity" << std::endl;
+	}
+	table = hash_table{prime};
+	std::cout << prime << std::endl;
 }
 
 // Destructor: NEED TO IMPLEMENT
@@ -135,6 +142,13 @@ size_t HashTable<T>::size()
 	return theSize;
 }
 
+// num_of_buckets: returns the number of buckets in the hashtable currently
+template <typename T>
+size_t HashTable<T>::num_of_buckets()
+{
+	return table.size();
+}
+
 
 // PRIVATE MEMBER FUNCTION
 
@@ -154,10 +168,11 @@ template <typename T>
 void HashTable<T>::rehash()
 {
 	hash_table oldTable = table;
-	table.resize(prime_below(2*table.size()));
+	table.resize(prime_below(2*oldTable.size()));
 	for (auto &bucketList : table) {
 		bucketList.clear();
 	}
+	theSize = 0;
 	for (auto &bucketList : oldTable) {
 		for (auto &element : bucketList) {
 			insert(element);
