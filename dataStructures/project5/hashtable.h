@@ -28,6 +28,7 @@ class HashTable {
 		void dump(); // display all entries in the hash table
 		bool write_to_file(const char *filename); // write all the values in the hashtable to a file named filename
 		size_t size(); // return the current size of the hashtable, not required
+		size_t num_of_buckets(); // return the number of buckets
 
 	private:
 		// private static constant member variables used in helper functions
