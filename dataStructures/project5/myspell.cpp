@@ -3,7 +3,11 @@
  */
 
 #include <iostream>
+#include <string>
 #include <fstream>
+#include <algorithm>
+#include <functional>
+#include <cctype>
 #include <regex>
 #include "hashtable.h"
 
@@ -60,17 +64,17 @@ void spell_check(string dictionary, string input, string output) {
 	while (getline(ifile, line)) {
 		cout << line << endl;
 		string corrected_line;
-		regex_search(line, word_match, word_regex);
-		for (auto x : word_match) {
-			cout << x << endl;
-		}
-		/*
 		while (regex_search(line, word_match, word_regex)) {
-			if (!dict.contains(word_match[0])) {
-				word_match[0];
+			string test = word_match[0];
+			if (!(dict.contains(test) || dict.contains(transform(test.begin(), test.end(), test.begin(), ptr_fun<int, int>(tolower))))) {
+				// find ten possible replacements
+				vector<string> suggestions;
+				string prefix, placeholder, suffix;
+				for (unsigned int n = 0; n < test.size() && suggestions.size() < 10; ++n) {
+				}
 			}
 			line = word_match.suffix().str();
-		}*/
+		}
 	}
 }
 
