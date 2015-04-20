@@ -8,7 +8,6 @@
 #include <algorithm>
 #include <functional>
 #include <cctype>
-#include <regex>
 #include "hashtable.h"
 
 
@@ -59,23 +58,68 @@ void spell_check(string dictionary, string input, string output) {
 	}
 	ofstream ofile{output, ios::trunc};
 	string line;
-	regex word_regex{"[[:alpha:]]+", std::regex_constants::extended};
-	smatch word_match;
 	while (getline(ifile, line)) {
-		cout << line << endl;
-		string corrected_line;
-		while (regex_search(line, word_match, word_regex)) {
-			string test = word_match[0];
-			if (!(dict.contains(test) || dict.contains(transform(test.begin(), test.end(), test.begin(), ptr_fun<int, int>(tolower))))) {
-				// find ten possible replacements
-				vector<string> suggestions;
-				string prefix, placeholder, suffix;
-				for (unsigned int n = 0; n < test.size() && suggestions.size() < 10; ++n) {
+		string test, corrected_line;
+		for (unsigned int i = 0; i < line.size(); ++i) {
+			char x = line[i]; // ith character in line
+			if (isalpha(x)) { // test if the character is part of the alphabet
+				test += x; // concatenate if the letter is in [:alpha:]
+				if ((i + 1 < line.size() && !isalpha(line[i + 1])) || i + 1 == line.size()) {
+					string test_lower = test;
+					transform(test.begin(), test.end(), test_lower.begin(), ptr_fun<int, int>(tolower));
+					if (!(dict.contains(test) || dict.contains(test_lower))) {
+						// find ten possible replacements
+						vector<string> suggestions;
+						string prefix, placeholder, suffix;
+						for (unsigned int n = 0; n < test.size() && suggestions.size() < 10; ++n) {
+							placeholder = test[n];
+							suffix = test.substr(n + 1);
+							for (char character : "abcdefghijklmnopqrstuvwxyz") {
+								string new_word = prefix + character + suffix;
+								if (dict.contains(new_word)) {
+									suggestions.push_back(new_word);
+									if (suggestions.size() >= 10) {
+										break;
+									}
+								}
+							}
+							prefix += placeholder;
+						}
+						// display output and take input
+						string test_upper = test;
+						transform(test.begin(), test.end(), test_upper.begin(), ptr_fun<int, int>(toupper));
+						cout << corrected_line << test_upper << line.substr(i + 1) << endl;
+						cout << "====================================" << endl;
+						for (unsigned int j = 0; j < suggestions.size(); ++j) {
+							cout << j << "): " << suggestions[j] << endl;
+						}
+						cout << "n (no change): " << endl;
+						cout << "====================================" << endl;
+						cout << "Your choice: ";
+						string input;
+						cin >> input;
+						unsigned int choice = input[0] - '0' >= 0 ? input[0] - '0' : 11; // 11 is chosen since it is greater than 10
+						switch(choice < suggestions.size()) {
+							case true:
+								test = suggestions[choice];
+								break;
+							case false:
+							default:
+								break;
+						};
+					}
+					// add the corrected word to the corrected_line and clear test for the next word
+					corrected_line += test;
+					test.clear();
 				}
+			} else {
+				corrected_line += x;
 			}
-			line = word_match.suffix().str();
 		}
+		ofile << corrected_line << endl;
 	}
+	ifile.close();
+	ofile.close();
 }
 
 /*
